@@ -122,7 +122,11 @@ ArduCAM::ArduCAM()
   sensor_model = OV7670;
   sensor_addr = 0x42;
 }
+#if defined(ARDUINO_ARCH_RENESAS_UNO)
+ArduCAM::ArduCAM(byte model ,int CS_CAM)
+#else
 ArduCAM::ArduCAM(byte model ,int CS)
+#endif
 {
 	#if defined (RASPBERRY_PI)
 		if(CS>=0)
@@ -132,15 +136,19 @@ ArduCAM::ArduCAM(byte model ,int CS)
 	#else
 		#if (defined(ESP8266)||defined(ESP32)||defined(TEENSYDUINO) ||defined(NRF52840_XXAA))
 		  B_CS = CS;
+        #elif (defined(ARDUINO_ARCH_RENESAS_UNO))
+          B_CS = CS_CAM;
 		#else
 		  P_CS  = portOutputRegister(digitalPinToPort(CS));
 		  B_CS  = digitalPinToBitMask(CS);
 		#endif
 	#endif
- #if defined (RASPBERRY_PI)
-  // pinMode(CS, OUTPUT);
+ #if !(defined (RASPBERRY_PI))
+ #if (defined(ARDUINO_ARCH_RENESAS_UNO))
+     pinMode(CS_CAM, OUTPUT);
  #else
 	  pinMode(CS, OUTPUT);
+  #endif
       sbi(P_CS, B_CS);
 	#endif
 	sensor_model = model;
@@ -2955,7 +2963,7 @@ int ArduCAM::wrSensorRegs8_8(const struct sensor_reg reglist[])
 	    reg_val = pgm_read_word(&next->val);
 	    err = wrSensorReg8_8(reg_addr, reg_val);
 	    next++;
-		#if (defined(ESP8266)||defined(ESP32)||defined(TEENSYDUINO))
+		#if (defined(ESP8266)||defined(ESP32)||defined(TEENSYDUINO)||defined(ARDUINO_ARCH_RENESAS_UNO))
 		    yield();
 		#endif
 	  }
@@ -2986,7 +2994,7 @@ int ArduCAM::wrSensorRegs8_16(const struct sensor_reg reglist[])
 	    //  if (!err)
 	    //return err;
 	    next++;
-		#if (defined(ESP8266)||defined(ESP32)||defined(TEENSYDUINO))
+		#if (defined(ESP8266)||defined(ESP32)||defined(TEENSYDUINO)||defined(ARDUINO_ARCH_RENESAS_UNO))
 			yield();
 		#endif
 	  }
@@ -3019,7 +3027,7 @@ int ArduCAM::wrSensorRegs16_8(const struct sensor_reg reglist[])
 	    //if (!err)
 	    //return err;
 	    next++;
-		#if (defined(ESP8266)||defined(ESP32)||defined(TEENSYDUINO))
+		#if (defined(ESP8266)||defined(ESP32)||defined(TEENSYDUINO)||defined(ARDUINO_ARCH_RENESAS_UNO))
 			yield();
 		#endif
 	  }
@@ -3045,7 +3053,7 @@ int ArduCAM::wrSensorRegs16_16(const struct sensor_reg reglist[])
 	    next++;
 	    reg_addr = pgm_read_word(&next->reg);
 	    reg_val = pgm_read_word(&next->val);
-			#if (defined(ESP8266)||defined(ESP32)||defined(TEENSYDUINO))
+			#if (defined(ESP8266)||defined(ESP32)||defined(TEENSYDUINO)||defined(ARDUINO_ARCH_RENESAS_UNO))
 			    yield();
 			#endif
 	  }

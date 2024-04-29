@@ -396,6 +396,26 @@
 #define regsize uint32_t
 #endif
 
+#if defined(ARDUINO_ARCH_RENESAS_UNO)
+#define cbi(reg, bitmask) digitalWrite(bitmask, LOW)
+#define sbi(reg, bitmask) digitalWrite(bitmask, HIGH)
+
+#define pulse_high(reg, bitmask) \
+	sbi(reg, bitmask);           \
+	cbi(reg, bitmask);
+#define pulse_low(reg, bitmask) \
+	cbi(reg, bitmask);          \
+	sbi(reg, bitmask);
+
+#define cport(port, data) port &= data
+#define sport(port, data) port |= data
+
+
+#define fontbyte(x) cfont.font[x]
+#define regtype volatile uint32_t
+#define regsize uint32_t
+#endif
+
 /****************************************************/
 /* Sensor related definition 												*/
 /****************************************************/
@@ -708,7 +728,11 @@ class ArduCAM
 {
 public:
 	ArduCAM(void);
+	#if defined(ARDUINO_ARCH_RENESAS_UNO)
+	ArduCAM(byte model, int CS_CAM);
+	#else
 	ArduCAM(byte model, int CS);
+	#endif
 	void InitCAM(void);
 
 	void CS_HIGH(void);
