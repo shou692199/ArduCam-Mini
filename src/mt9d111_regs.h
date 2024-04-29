@@ -1,7 +1,7 @@
 #ifndef MT9D111_REGS_H
 #define MT9D111_REGS_H
 #include "ArduCAM.h"
-//#include <avr/pgmspace.h>
+// #include <avr/pgmspace.h>
 
 /*******************************************************************************************
  #  Display resolution standards #
